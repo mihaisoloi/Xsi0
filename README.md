@@ -1,2 +1,2 @@
-# Xsi0
-heroky app for playing a tic tac toe game
+#### Xsi0 ####
+Heroku app for playing a tic tac toe game

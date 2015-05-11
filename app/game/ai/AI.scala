@@ -69,7 +69,7 @@ case class MinMax(aiSymbol: Symbol) extends AI{
       0
 }
 
-class Hotseat extends AI{
+case object Hotseat extends AI {
 
   /**
    * Each person takes turns until the game is over

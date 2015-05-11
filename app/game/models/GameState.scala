@@ -9,7 +9,7 @@ case class GameState(board: Board, toMove: Symbol) {
    * This takes a value from 1 to 9
    */
   def placeMove(position: Int) =
-    GameState(board.placeMove(toMove, position), nextSymbolToMove(toMove))
+    GameState(board.placeMove(toMove, position), toMove.other)
 
   def isBoardEmpty: Boolean =
     board.isInstanceOf[Board.Empty]
@@ -19,9 +19,4 @@ case class GameState(board: Board, toMove: Symbol) {
 
   def getWinningSymbol: Option[Symbol] =
     board.findWinningSymbol
-
-  def nextSymbolToMove(symbol: Symbol): Symbol = symbol match {
-    case X => O
-    case O => X
-  }
 }

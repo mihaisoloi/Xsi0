@@ -63,7 +63,7 @@ case class MinMax(aiSymbol: Symbol) extends AI{
   def scoreState(state: GameState, depth: Int, baseScore: Int) =
     if(state.getWinningSymbol.exists(aiSymbol.equals)) // AI
       baseScore - depth
-    else if(state.getWinningSymbol.exists(state.nextSymbolToMove(aiSymbol).equals)) // human
+    else if(state.getWinningSymbol.exists(aiSymbol.other.equals)) // human
       depth - baseScore
     else
       0

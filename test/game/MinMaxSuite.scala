@@ -7,7 +7,7 @@ import game.ai.MinMax
 class MinMaxSuite extends Specification with Fixtures{
 
   "AI" should {
-    "pick the last open position" in {
+    /*"pick the last open position" in {
       val ai = MinMax(X)
       val endGameState = ai.turn(lastMoveGameState)
 
@@ -27,7 +27,26 @@ class MinMaxSuite extends Specification with Fixtures{
       val nextGameState = ai.turn(XtoWinGameState)
 
       nextGameState.isGameOver mustEqual true
-      nextGameState.getWinningSymbol mustEqual X
+      nextGameState.getWinningSymbol mustEqual Some(X)
+    }
+
+    "pick blocking move" in {
+      val ai = MinMax(X)
+      val nextGameState = ai.turn(xToBlockGameState)
+
+      nextGameState.board.isPositionOccupied(2) mustEqual true
+    }
+
+    /**
+     * Player will play random positions, algorithm must beat random or at least tie
+     */
+    "win or tie vs a random game play as 2nd player" in {
+      import game.models._
+      cycle(MinMax(O), GameState(emptyBoard, X)).getWinningSymbol must beOneOf(Some(O), Option.empty[Symbol])
+    }*/
+
+    "win or tie vs a random game play as 1st player" in {
+      cycle(MinMax(X), xToBlockPossibleGameState).getWinningSymbol must beOneOf(Some(X), Option.empty[Symbol])
     }
   }
 }

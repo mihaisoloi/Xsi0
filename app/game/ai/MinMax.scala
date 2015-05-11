@@ -2,24 +2,29 @@ package game.ai
 
 import game.models.{GameState, Symbol}
 
+sealed trait AI {
+  def turn(state: GameState): GameState
+}
+
 /**
  * Using the MinMax algorithm to make an invincible player, evil laughter
  */
-case class MinMax(aiSymbol: Symbol) {
+case class MinMax(aiSymbol: Symbol) extends AI{
 
   val initialDepth = 0
   case class Node(score: Int, position: Int)
 
-  def turn(state: GameState) = {
+  def turn(state: GameState): GameState = {
     require(!state.isGameOver, "Game is already over!")
 
     state.placeMove(choosePosition(state))
   }
 
   def choosePosition(state: GameState): Int = {
-    if(state.isBoardEmpty)
-      state.board.mostFavorableStartingPositions((math.random * state.board.space.size).toInt)
-    else if (state.board.availablePositions.size == 1)
+    if(state.isBoardEmpty) {
+      val startingPos = state.board.mostFavorableStartingPositions
+      startingPos((math.random * (startingPos.size - 1)).toInt)
+    } else if (state.board.availablePositions.size == 1)
       state.board.availablePositions.head
     else
       bestPossiblePosition(state)
@@ -27,37 +32,51 @@ case class MinMax(aiSymbol: Symbol) {
 
   def bestPossiblePosition(state: GameState): Int = {
     val score = state.board.availablePositions.size + 1
-    minmax(state, initialDepth, Node(score, state.board.availablePositions.head)).position
+    minmax(state, initialDepth, score).position
   }
 
-  def minmax(state: GameState, currentDepth: Int, previousNode: Node): Node = {
+  def minmax(state: GameState, currentDepth: Int, baseScore: Int): Node = {
+    // in the case of a draw, we'll still choose the best move, such that the other player doesn't win
     if(state.isGameOver)
-      Node(score = evaluateState(state, currentDepth, previousNode.score), position = previousNode.position)
+      Node(scoreState(state, currentDepth, baseScore), Int.MinValue) // only care about the last move score, not the position
     else {
       val candidateNodes: Seq[Node] =
         for {
-          position <- state.board.availablePositions.tail
+          position <- state.board.availablePositions
 
           childGameState = state.placeMove(position)
+          nextNode = minmax(childGameState, currentDepth + 1, baseScore)
         } yield
-          minmax(childGameState, currentDepth + 1, previousNode)
+          Node(nextNode.score, position)
 
       //do the min-max calculation
       if(state.toMove == aiSymbol)
-        candidateNodes.maxBy(n => n.score)
+        candidateNodes.maxBy(_.score)
       else
-        candidateNodes.minBy(n => n.score)
+        candidateNodes.minBy(_.score)
     }
   }
 
   /**
    * Returns the score of the state based on the depth
    */
-  def evaluateState(state: GameState, depth: Int, score: Int) =
+  def scoreState(state: GameState, depth: Int, baseScore: Int) =
     if(state.getWinningSymbol.exists(aiSymbol.equals)) // AI
-      score - depth
+      baseScore - depth
     else if(state.getWinningSymbol.exists(state.nextSymbolToMove(aiSymbol).equals)) // human
-      depth - score
+      depth - baseScore
     else
       0
+}
+
+class Hotseat extends AI{
+
+  /**
+   * Each person takes turns until the game is over
+   */
+  def turn(state: GameState): GameState = {
+    require(!state.isGameOver, "Game is already over!")
+
+    state
+  }
 }

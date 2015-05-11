@@ -50,6 +50,9 @@ sealed trait Board {
     Board.Occupied(space = space.updated(index, Some(symbol)))
   }
 
+  def isPositionOccupied(position: Int): Boolean =
+    space(position - 1).isDefined
+
   /**
    * Choosing the corners and center is a good strategy in Xsi0
    */

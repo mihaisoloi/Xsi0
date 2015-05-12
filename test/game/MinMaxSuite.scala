@@ -46,7 +46,7 @@ class MinMaxSuite extends Specification with Fixtures{
     }
 
     "win or tie vs a random game play as 1st player" in {
-      cycle(MinMax(X), GameState(emptyBoard, X)).getWinningSymbol must beOneOf(Some(X), Option.empty[Symbol])
+      cycle(MinMax(X), xToBlockPossibleGameState).getWinningSymbol must beOneOf(Some(X), Option.empty[Symbol])
     }
   }
 }
